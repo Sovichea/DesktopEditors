@@ -34,7 +34,8 @@ Development forks:
 - Phase 5: complete in `core` commit `95d6bef926`; see `tests/enhanced-unicode/PHASE_5_CAPACITY_SHARDING.md`
 - Phase 6: complete in `core` commit `bf6b5da695`; see `tests/enhanced-unicode/PHASE_6_SOURCE_ORDER_SERIALIZATION.md`
 - Phase 7: complete in `core` commit `62c618c6c3`; see `tests/enhanced-unicode/PHASE_7_LOGICAL_METAFILE_PROTOCOL.md`
-- Phases 8-12: not started
+- Phase 8: complete in `sdkjs` commit `4f8209a901`; see `tests/enhanced-unicode/PHASE_8_SDKJS_LOGICAL_UNITS.md`
+- Phases 9-12: not started
 
 ## Goals
 
