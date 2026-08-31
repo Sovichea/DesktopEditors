@@ -36,7 +36,8 @@ Development forks:
 - Phase 7: complete in `core` commit `62c618c6c3`; see `tests/enhanced-unicode/PHASE_7_LOGICAL_METAFILE_PROTOCOL.md`
 - Phase 8: complete in `sdkjs` commit `4f8209a901`; see `tests/enhanced-unicode/PHASE_8_SDKJS_LOGICAL_UNITS.md`
 - Phase 9: complete in `sdkjs` commit `e6fbf921fd`; see `tests/enhanced-unicode/PHASE_9_LOGICAL_METAFILE_EMISSION.md`
-- Phases 10-12: not started
+- Phase 10: complete in `core` commit `f0d766a85f`; see `tests/enhanced-unicode/PHASE_10_PDF_INTEGRATION.md`
+- Phases 11-12: not started
 
 ## Goals
 
