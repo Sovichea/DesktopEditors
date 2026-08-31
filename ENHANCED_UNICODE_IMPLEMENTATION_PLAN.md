@@ -33,7 +33,8 @@ Development forks:
 - Phase 4: complete in `core` commit `20d7bb7525`; see `tests/enhanced-unicode/PHASE_4_SYNTHETIC_TRUE_TYPE.md`
 - Phase 5: complete in `core` commit `95d6bef926`; see `tests/enhanced-unicode/PHASE_5_CAPACITY_SHARDING.md`
 - Phase 6: complete in `core` commit `bf6b5da695`; see `tests/enhanced-unicode/PHASE_6_SOURCE_ORDER_SERIALIZATION.md`
-- Phases 7-12: not started
+- Phase 7: complete in `core` commit `62c618c6c3`; see `tests/enhanced-unicode/PHASE_7_LOGICAL_METAFILE_PROTOCOL.md`
+- Phases 8-12: not started
 
 ## Goals
 
