@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 import unicodedata
 from pathlib import Path
 
@@ -108,6 +109,7 @@ if __name__ == "__main__":
     parser.add_argument("--normal", type=Path, required=True)
     parser.add_argument("--raw", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--strict", action="store_true", help="fail unless every normal extraction line is exact")
     args = parser.parse_args()
 
     report = audit(args.manifest, args.normal, args.raw)
@@ -117,3 +119,5 @@ if __name__ == "__main__":
         f"normal contains: {report['normal_contains_count']}/{report['case_count']}; "
         f"raw contains: {report['raw_contains_count']}/{report['case_count']}"
     )
+    if args.strict and report["normal_exact_count"] != report["case_count"]:
+        sys.exit(1)
