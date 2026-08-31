@@ -9,6 +9,7 @@ build_output.log
 /third_party/
 /vcpkg_installed/
 /package/
+/Testing/
 /build/windows/.tools/
 
 # Root-level CMake and Ninja state

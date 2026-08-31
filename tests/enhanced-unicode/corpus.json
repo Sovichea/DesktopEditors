@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "title": "DesktopEditors Enhanced Unicode baseline corpus",
+  "default_font": "Arial",
+  "cases": [
+    {
+      "id": "latin-basic",
+      "label": "Basic Latin",
+      "direction": "ltr",
+      "text": "The quick brown fox jumps over the lazy dog 0123456789.",
+      "purpose": "Control case for ordinary one-code-point glyphs."
+    },
+    {
+      "id": "latin-ligatures",
+      "label": "Latin ligature candidates",
+      "direction": "ltr",
+      "text": "office affine efficient final difficult: fi ffi ffl ff fl",
+      "purpose": "Exercises several source scalars shaped into shared ligature glyphs."
+    },
+    {
+      "id": "combining-marks",
+      "label": "Combining marks",
+      "direction": "ltr",
+      "text": "Å é ñ ậ Ż",
+      "purpose": "Exercises multiple positioned glyphs and marks for one logical sequence."
+    },
+    {
+      "id": "normalization-distinction",
+      "label": "Distinct authored normalization forms",
+      "direction": "ltr",
+      "text": "composed: Å é ñ; decomposed: Å é ñ",
+      "purpose": "Requires exact authored Unicode without normalization."
+    },
+    {
+      "id": "whitespace-semantics",
+      "label": "Whitespace semantics",
+      "direction": "ltr",
+      "code_points": [
+        "0073", "0070", "0061", "0063", "0065", "003A", "0020", "0041", "0020", "0042",
+        "003B", "0020", "006E", "0062", "0073", "0070", "003A", "0020", "0041", "00A0", "0042"
+      ],
+      "purpose": "Checks distinct Unicode sequences that may share visual spacing."
+    },
+    {
+      "id": "variation-selectors",
+      "label": "Variation selectors",
+      "direction": "ltr",
+      "code_points": ["0074", "0065", "0078", "0074", "003A", "0020", "2764", "FE0E", "003B", "0020", "0076", "0061", "0072", "0069", "0061", "0074", "0069", "006F", "006E", "003A", "0020", "2764", "FE0F"],
+      "purpose": "Preserves variation selectors even when fallback rendering is identical."
+    },
+    {
+      "id": "emoji-zwj",
+      "label": "Supplementary scalars and ZWJ sequence",
+      "direction": "ltr",
+      "code_points": ["0066", "0061", "006D", "0069", "006C", "0079", "003A", "0020", "1F469", "200D", "1F469", "200D", "1F467", "200D", "1F466"],
+      "purpose": "Exercises supplementary scalars, zero-width joiners, and a multi-scalar visual."
+    },
+    {
+      "id": "arabic",
+      "label": "Arabic",
+      "direction": "rtl",
+      "text": "اللغة العربية جميلة لا إله إلا الله",
+      "purpose": "Exercises contextual shaping, ligatures, marks, and RTL source order."
+    },
+    {
+      "id": "hebrew",
+      "label": "Hebrew with marks",
+      "direction": "rtl",
+      "text": "עברית שָׁלוֹם עולם",
+      "purpose": "Exercises RTL order and positioned Hebrew combining marks."
+    },
+    {
+      "id": "mixed-bidi",
+      "label": "Mixed LTR and RTL",
+      "direction": "ltr",
+      "text": "English العربية 123 עברית end.",
+      "purpose": "Separates authoritative source order from independent visual origins."
+    },
+    {
+      "id": "khmer",
+      "label": "Khmer",
+      "direction": "ltr",
+      "text": "ភាសាខ្មែរជាភាសាដ៏ស្រស់ស្អាត",
+      "purpose": "Exercises complex multi-component clusters."
+    },
+    {
+      "id": "devanagari",
+      "label": "Devanagari",
+      "direction": "ltr",
+      "text": "हिन्दी भाषा सुन्दर है क्ष त्र ज्ञ",
+      "purpose": "Exercises reordering marks, conjuncts, and multi-glyph clusters."
+    },
+    {
+      "id": "thai",
+      "label": "Thai",
+      "direction": "ltr",
+      "text": "ภาษาไทยมีความสวยงาม กำลัง ทดสอบ",
+      "purpose": "Exercises positioned vowels and tone marks."
+    },
+    {
+      "id": "lao",
+      "label": "Lao",
+      "direction": "ltr",
+      "text": "ພາສາລາວມີຄວາມສວຍງາມ",
+      "purpose": "Exercises positioned vowel and tone-mark clusters."
+    },
+    {
+      "id": "cjk",
+      "label": "CJK",
+      "direction": "ltr",
+      "text": "中文测试 日本語テスト 한국어 시험",
+      "purpose": "Exercises fallback fonts and large source GID namespaces."
+    }
+  ]
+}

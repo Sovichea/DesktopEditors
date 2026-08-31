@@ -24,6 +24,11 @@ Development forks:
 - `https://github.com/Sovichea/core`
 - `https://github.com/Sovichea/sdkjs`
 
+## Progress
+
+- Phase 0: complete; see `tests/enhanced-unicode/PHASE_0_BASELINE.md`
+- Phases 1-12: not started
+
 ## Goals
 
 The Enhanced Unicode path must keep the following identities separate:
