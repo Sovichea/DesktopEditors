@@ -29,7 +29,8 @@ Development forks:
 - Phase 0: complete; baseline corpus and findings are documented in `tests/enhanced-unicode/PHASE_0_BASELINE.md`
 - Phase 1: complete in `core` commit `939e3e5bf5`; see `tests/enhanced-unicode/PHASE_1_NATIVE_LOGICAL_UNIT.md`
 - Phase 2: complete in `core` commit `bfd601292d`; see `tests/enhanced-unicode/PHASE_2_SEMANTIC_VISUAL_ALLOCATION.md`
-- Phases 3-12: not started
+- Phase 3: complete in `core` commit `6714ccd998`; see `tests/enhanced-unicode/PHASE_3_COMPACT_SOURCE_FONTS.md`
+- Phases 4-12: not started
 
 ## Goals
 
