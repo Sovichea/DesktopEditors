@@ -157,13 +157,17 @@ function Get-VsInstallPath {
 }
 
 # Locate the Inno Setup program directory (the folder with iscc.exe and its
-# Languages\ subfolder). Prefer a real install (it carries the compiler support
-# files) over a Chocolatey shim, then any iscc.exe on PATH, then -InnoRoot.
-# Returns $null if none found. Used by both the dependency install (to stage
-# language files) and the packaging step (to set INNOPATH).
+# Languages\ subfolder). Prefer a per-user install so developers can update
+# without elevation, then a system install, any iscc.exe on PATH, and -InnoRoot.
+# Returns $null if none found.
 function Get-InnoRoot([string]$Fallback) {
-    $isccItem = Get-ChildItem 'C:\Program Files (x86)\Inno Setup*','C:\Program Files\Inno Setup*' `
-                    -Recurse -Filter iscc.exe -ErrorAction SilentlyContinue | Select-Object -First 1
+    $searchRoots = @(
+        (Join-Path $env:LOCALAPPDATA 'Programs\Inno Setup*'),
+        'C:\Program Files (x86)\Inno Setup*',
+        'C:\Program Files\Inno Setup*'
+    )
+    $isccItem = Get-ChildItem $searchRoots -Recurse -Filter iscc.exe -ErrorAction SilentlyContinue |
+        Select-Object -First 1
     if ($isccItem) { return Split-Path $isccItem.FullName }
     $iscc = Get-Command iscc.exe -ErrorAction SilentlyContinue
     if ($iscc) { return Split-Path $iscc.Source }
@@ -171,15 +175,22 @@ function Get-InnoRoot([string]$Fallback) {
     return $null
 }
 
+# Copy Inno into a writable build-local directory. Language paths using Inno's
+# "compiler:" prefix are resolved relative to iscc.exe, so copying only the
+# Languages directory would not let common.iss find the downloaded files.
+function Initialize-InnoStagingRoot([string]$SourceRoot, [string]$StagingRoot) {
+    if (-not (Test-Path (Join-Path $SourceRoot 'iscc.exe'))) {
+        throw "Inno Setup compiler not found at $SourceRoot."
+    }
+    New-Item -ItemType Directory -Force -Path $StagingRoot | Out-Null
+    Copy-Item -Path (Join-Path $SourceRoot '*') -Destination $StagingRoot -Recurse -Force
+    return $StagingRoot
+}
+
 # Stage jrsoftware's "unofficial" Inno translations (Greek, etc.) that
-# common.iss references but that ship in NO stock Inno install - they live in a
-# separate translations collection. This is a PACKAGING INPUT (like the
-# vc_redist pre-stage), not a heavy tool install, so it must run on every
-# packaging build regardless of -InstallDeps - which is why it's called from the
-# packaging step, not gated behind -InstallDeps (CI doesn't pass that). It's
-# idempotent (skips files already present). It writes into the Inno install's
-# Languages dir, so it needs write access there: fine on CI (admin); a plain
-# local packaging run may need elevation.
+# common.iss references but that ship in no stock Inno install. This is a
+# packaging input, so it runs on every packaging build regardless of
+# -InstallDeps. Files are downloaded into the writable build-local Inno copy.
 function Sync-InnoLanguages([string]$LanguagesDir) {
     if (-not (Test-Path $LanguagesDir)) {
         Write-Warning "Inno Languages dir not found ($LanguagesDir) - skipping unofficial language staging."
@@ -187,7 +198,7 @@ function Sync-InnoLanguages([string]$LanguagesDir) {
     }
     # Pin $issTag to the tag matching your Inno version to avoid message-version
     # mismatches (e.g. 'is-6_7_1'); 'main' = latest.
-    $issTag  = 'is-6_7_1'
+    $issTag  = 'is-6_7_3'
     $apiUrl  = "https://api.github.com/repos/jrsoftware/issrc/contents/Files/Languages/Unofficial?ref=$issTag"
     $headers = @{ 'User-Agent' = 'eo-build' }
     # Authenticate the API call when a token is available (CI) so the single
@@ -277,7 +288,7 @@ try {
 
         # 1c. Packaging tools via Chocolatey.
         if (Get-Command choco -ErrorAction SilentlyContinue) {
-            choco install innosetup --version=6.2.2 -y --no-progress
+            choco install innosetup --version=6.7.3 -y --no-progress
             choco install 7zip -y --no-progress
             if ($BuildMsi) {
                 choco install advanced-installer -y --no-progress
@@ -350,6 +361,13 @@ Either download the 'common-files' CI artifact and pass -CommonDir, or rerun wit
     # for those four, then Cygwin's bin (so bash/sh/make are Cygwin's, not Git's
     # MSYS ones), then the rest of PATH.
     Write-Step "4. Setting up PATH ordering + CYGWIN_ROOT"
+    # A Cygwin-first PATH can hide an installed native Perl. Prefer the standard
+    # per-user Strawberry location when present, without changing user PATH.
+    $strawberryPerlDir = Join-Path $env:LOCALAPPDATA 'Programs\StrawberryPerl\perl\bin'
+    if (Test-Path (Join-Path $strawberryPerlDir 'perl.exe')) {
+        $env:PATH = "$strawberryPerlDir;$env:PATH"
+    }
+
     $nativeDirs = @()
     foreach ($tool in 'perl','python','git','cmake') {
         $cmd = Get-Command $tool -ErrorAction SilentlyContinue
@@ -413,6 +431,15 @@ Either download the 'common-files' CI artifact and pass -CommonDir, or rerun wit
     # ─────────── load MSVC env (vcvars) on top of our ordered PATH ───────────
     Write-Step "Loading MSVC environment (vcvars)"
     Import-VcVars -Arch $Arch -SdkVersion $WinSdkVersion
+
+    # This build always targets MSVC. User-level CC/CXX overrides can otherwise
+    # make CMake combine MinGW C with MSVC C++, producing an invalid toolchain.
+    foreach ($compilerOverride in 'CC','CXX') {
+        if (Test-Path "Env:$compilerOverride") {
+            Write-Warning "Ignoring $compilerOverride=$([Environment]::GetEnvironmentVariable($compilerOverride)) for the MSVC build."
+            Remove-Item "Env:$compilerOverride"
+        }
+    }
 
     # ───────────────────────── 7. CMake Configure ───────────────────────────
     # Generator is Ninja (NOT the VS/MSBuild generator) on purpose: MSBuild
@@ -543,16 +570,17 @@ Either download the 'common-files' CI artifact and pass -CommonDir, or rerun wit
             Assert-LastExit "make_zip.ps1"
 
             Write-Step "11b. Build Inno installer (make_inno.ps1)"
-            # INNOPATH must point at the Inno Setup program directory. The
-            # unofficial language files it relies on are staged during -InstallDeps.
-            $env:INNOPATH = Get-InnoRoot $InnoRoot
-            if (-not $env:INNOPATH) {
+            $installedInnoRoot = Get-InnoRoot $InnoRoot
+            if (-not $installedInnoRoot) {
                 throw "Inno Setup (iscc.exe) not found. Install it (run with -InstallDeps) or pass -InnoRoot."
             }
-            Write-Host "INNOPATH=$env:INNOPATH"
 
-            # common.iss references jrsoftware's unofficial translations, which
-            # ship in no stock Inno install - stage them now (idempotent).
+            # Never modify the installation under Program Files. common.iss uses
+            # compiler-relative language paths, so package with a complete local
+            # copy of Inno and add the unofficial translations to that copy.
+            $innoStagingRoot = Join-Path $RepoRoot 'build\windows\.tools\inno-setup'
+            $env:INNOPATH = Initialize-InnoStagingRoot $installedInnoRoot $innoStagingRoot
+            Write-Host "INNOPATH=$env:INNOPATH"
             Sync-InnoLanguages (Join-Path $env:INNOPATH 'Languages')
 
             # make_inno.ps1 bundles the VC++ redistributable, fetching it at
@@ -582,8 +610,27 @@ Either download the 'common-files' CI artifact and pass -CommonDir, or rerun wit
             }
             Write-Host "VCRedist staged: $((Get-Item $vcRedist).VersionInfo.ProductVersion)"
 
-            .\make_inno.ps1 -Version $VersionFull -Arch $Arch -Target $Target
-            Assert-LastExit "make_inno.ps1"
+            # Inno Setup 6 does not support extended-length source paths. The
+            # deeply nested template filenames exceed MAX_PATH from a typical
+            # checkout, so invoke packaging through a temporary short drive.
+            # Map desktop-apps (rather than package) because common.iss reads
+            # branding assets from the sibling win-linux directory.
+            $shortDrive = @('Z','Y','X','W','V','U','T','S','R','Q','P') |
+                Where-Object { -not (Test-Path "$_`:\") } |
+                Select-Object -First 1
+            if (-not $shortDrive) { throw 'No free drive letter is available for Inno short-path staging.' }
+
+            & subst.exe "$shortDrive`:" (Join-Path $RepoRoot 'desktop-apps')
+            Assert-LastExit "subst $shortDrive`:"
+            try {
+                & "$shortDrive`:\package\make_inno.ps1" -Version $VersionFull -Arch $Arch -Target $Target
+                Assert-LastExit "make_inno.ps1"
+            } finally {
+                # make_inno.ps1 changes the current directory to its own path.
+                # Leave the mapped drive before removing it.
+                Set-Location $PackageDir
+                & subst.exe "$shortDrive`:" /D
+            }
 
             if ($BuildMsi) {
                 Write-Step "11c. Build MSI (make_advinst.ps1)"

@@ -6,10 +6,10 @@
 	url = https://github.com/Euro-Office/desktop-sdk.git
 [submodule "core"]
 	path = core
-	url = https://github.com/Euro-Office/core.git
+	url = https://github.com/Sovichea/core.git
 [submodule "sdkjs"]
 	path = sdkjs
-	url = https://github.com/Euro-Office/sdkjs.git
+	url = https://github.com/Sovichea/sdkjs.git
 [submodule "dictionaries"]
 	path = dictionaries
 	url = https://github.com/Euro-Office/dictionaries.git
