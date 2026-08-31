@@ -32,7 +32,8 @@ Development forks:
 - Phase 3: complete in `core` commit `6714ccd998`; see `tests/enhanced-unicode/PHASE_3_COMPACT_SOURCE_FONTS.md`
 - Phase 4: complete in `core` commit `20d7bb7525`; see `tests/enhanced-unicode/PHASE_4_SYNTHETIC_TRUE_TYPE.md`
 - Phase 5: complete in `core` commit `95d6bef926`; see `tests/enhanced-unicode/PHASE_5_CAPACITY_SHARDING.md`
-- Phases 6-12: not started
+- Phase 6: complete in `core` commit `bf6b5da695`; see `tests/enhanced-unicode/PHASE_6_SOURCE_ORDER_SERIALIZATION.md`
+- Phases 7-12: not started
 
 ## Goals
 
