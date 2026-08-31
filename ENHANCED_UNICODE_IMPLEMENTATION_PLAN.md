@@ -30,7 +30,8 @@ Development forks:
 - Phase 1: complete in `core` commit `939e3e5bf5`; see `tests/enhanced-unicode/PHASE_1_NATIVE_LOGICAL_UNIT.md`
 - Phase 2: complete in `core` commit `bfd601292d`; see `tests/enhanced-unicode/PHASE_2_SEMANTIC_VISUAL_ALLOCATION.md`
 - Phase 3: complete in `core` commit `6714ccd998`; see `tests/enhanced-unicode/PHASE_3_COMPACT_SOURCE_FONTS.md`
-- Phases 4-12: not started
+- Phase 4: complete in `core` commit `20d7bb7525`; see `tests/enhanced-unicode/PHASE_4_SYNTHETIC_TRUE_TYPE.md`
+- Phases 5-12: not started
 
 ## Goals
 
