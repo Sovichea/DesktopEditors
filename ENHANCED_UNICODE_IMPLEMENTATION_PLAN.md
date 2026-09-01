@@ -37,7 +37,8 @@ Development forks:
 - Phase 8: complete in `sdkjs` commit `4f8209a901`; see `tests/enhanced-unicode/PHASE_8_SDKJS_LOGICAL_UNITS.md`
 - Phase 9: complete in `sdkjs` commit `e6fbf921fd`; see `tests/enhanced-unicode/PHASE_9_LOGICAL_METAFILE_EMISSION.md`
 - Phase 10: complete in `core` commit `f0d766a85f`; see `tests/enhanced-unicode/PHASE_10_PDF_INTEGRATION.md`
-- Phase 11: logical-font primitive qualified; default enablement deferred; see `tests/enhanced-unicode/PHASE_11_QUALIFICATION.md`
+- Phase 11: complete; logical-font primitive qualified and Enhanced Unicode enabled by default; see `tests/enhanced-unicode/PHASE_11_QUALIFICATION.md`
+- Identity-V: explicit vertical logical units supported; see `tests/enhanced-unicode/IDENTITY_V_SUPPORT.md`
 - Phase 12: not started
 
 ## Goals
@@ -80,7 +81,7 @@ The following remain on the existing rendering path until separately designed an
 - Variable fonts that have not been instantiated to a supported static font
 - Color, SVG, or bitmap-only glyph formats
 - Fonts that cannot legally or technically be embedded and rewritten
-- Vertical PDF writing mode unless explicitly added to a later phase
+- Automatic classification of rotated text as vertical writing; true vertical units use the explicit Identity-V contract
 
 The existing ordinary text and PDF export paths must remain available and unchanged for unsupported cases.
 

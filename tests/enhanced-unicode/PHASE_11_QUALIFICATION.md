@@ -4,22 +4,23 @@
 
 Phase 11 qualifies the supported logical-font primitive implemented through the production `CPdfWriter` path.
 
-**Enhanced Unicode is not ready to become the default DesktopEditors export path.** The feature remains disabled by default behind:
+Enhanced Unicode is enabled by default in `sdkjs`. The public switch remains the rollback boundary:
 
 ```javascript
-AscCommon.SetEnhancedUnicodeEnabled(true);
+AscCommon.SetEnhancedUnicodeEnabled(false);
 ```
 
 The current result is:
 
 ```text
 supported TrueType logical-font primitive: qualified
-full DesktopEditors default exporter:       not yet qualified
+DesktopEditors Enhanced Unicode path:       enabled by default
+broader corpus and viewer coverage:         continuing qualification
 ```
 
 ## Objective
 
-Phase 11 evaluates PDF syntax, logical-font validity, extraction, source ordering, rendering comparison infrastructure, bounded font publication, and production telemetry. It also identifies the remaining work required before default enablement.
+Phase 11 evaluates PDF syntax, logical-font validity, extraction, source ordering, rendering comparison infrastructure, bounded font publication, and production telemetry. It also records the remaining qualification work after default enablement.
 
 ## Deferred shard finalization
 
@@ -301,7 +302,7 @@ Phase 11 removes the known quadratic snapshot behavior and demonstrates these bo
 
 The configured ratio thresholds for PDF size, export time, and peak memory remain prospective. They cannot be accepted or rejected until the same real DesktopEditors corpus is exported once with Enhanced Unicode disabled and once enabled through the complete `sdkjs -> command 84 -> CPdfWriter` path.
 
-## Remaining blockers to default enablement
+## Remaining limitations and follow-up qualification
 
 1. No stable headless path currently exports the full corpus through `sdkjs` shaping, command 84, and `CPdfWriter`.
 2. Spaces, NBSP, tabs, numbering, math, breaks, temporary glyphs, forced glyphs, gaps, and text-to-path output are not uniformly represented as logical units.
@@ -315,13 +316,13 @@ The configured ratio thresholds for PDF size, export time, and peak memory remai
 
 ## Readiness verdict
 
-Phase 11 validates the core representation and production logical-font bridge for the controlled static TrueType fixtures. It does not satisfy the plan's original exit criterion that every required corpus fixture pass through the full application path.
+Phase 11 validates the core representation and production logical-font bridge for the controlled static TrueType fixtures. The project has accepted the documented limitations and enabled Enhanced Unicode by default while broader corpus and viewer qualification continues.
 
 Therefore:
 
 ```text
-keep Enhanced Unicode default-off
-retain the feature switch as the rollback boundary
-proceed only with explicit development/test exports
-complete corpus and viewer qualification before default enablement
+enable Enhanced Unicode by default
+retain the feature switch as an immediate rollback boundary
+keep compatibility fallback for unsupported units and font states
+continue corpus, viewer, PDF/A, PDF/UA, and performance qualification
 ```

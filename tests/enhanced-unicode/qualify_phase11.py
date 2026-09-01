@@ -86,6 +86,27 @@ def width_coverage(widths: object) -> set[int]:
     return covered
 
 
+def vertical_metric_coverage(metrics: object) -> set[int]:
+    covered: set[int] = set()
+    if not isinstance(metrics, list):
+        return covered
+    index = 0
+    while index + 1 < len(metrics):
+        first = int(metrics[index])
+        second = metrics[index + 1]
+        if isinstance(second, list):
+            if len(second) % 3:
+                return set()
+            covered.update(range(first, first + len(second) // 3))
+            index += 2
+        elif index + 4 < len(metrics):
+            covered.update(range(first, int(second) + 1))
+            index += 5
+        else:
+            break
+    return covered
+
+
 def inspect_logical_fonts(reader: PdfReader, used_cids: dict[str, set[int]]) -> list[dict[str, Any]]:
     seen: set[tuple[int, int] | int] = set()
     fonts: list[dict[str, Any]] = []
@@ -106,6 +127,7 @@ def inspect_logical_fonts(reader: PdfReader, used_cids: dict[str, set[int]]) -> 
             if "+Logical" not in pdf_name:
                 continue
             errors: list[str] = []
+            encoding = decode_pdf_name(parent.get("/Encoding"))
             font_file = b""
             gids: list[int] = []
             glyph_count = None
@@ -156,10 +178,21 @@ def inspect_logical_fonts(reader: PdfReader, used_cids: dict[str, set[int]]) -> 
                     errors.append("logical /W does not cover every CID used by page content")
                 if parent.get("/ToUnicode") is None:
                     errors.append("logical parent has no /ToUnicode entry")
+                if encoding == "Identity-V":
+                    if descendant.get("/DW2") is None:
+                        errors.append("logical Identity-V descendant has no /DW2 entry")
+                    vertical_metrics = descendant.get("/W2")
+                    if vertical_metrics is None:
+                        errors.append("logical Identity-V descendant has no /W2 entry")
+                    elif not required_cids.issubset(vertical_metric_coverage(vertical_metrics)):
+                        errors.append("logical /W2 does not cover every vertical CID used by page content")
+                elif encoding != "Identity-H":
+                    errors.append(f"logical Type 0 font uses unsupported encoding {encoding!r}")
             except Exception as error:
                 errors.append(str(error))
             fonts.append({
                 "pdf_name": pdf_name,
+                "encoding": encoding,
                 "font_file_bytes": len(font_file),
                 "cid_count": len(gids),
                 "max_gid": max(gids, default=0),
