@@ -70,13 +70,18 @@ APP_PROPERTIES = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 
 def case_text(case: dict[str, object]) -> str:
+    prefix = case.get("prefix", "")
+    suffix = case.get("suffix", "")
+    if not isinstance(prefix, str) or not isinstance(suffix, str):
+        raise ValueError(f"Case {case.get('id')} has a non-string prefix or suffix")
+
     text = case.get("text")
     if isinstance(text, str):
-        return text
+        return prefix + text + suffix
     points = case.get("code_points")
     if not isinstance(points, list):
         raise ValueError(f"Case {case.get('id')} has neither text nor code_points")
-    return "".join(chr(int(str(point), 16)) for point in points)
+    return prefix + "".join(chr(int(str(point), 16)) for point in points) + suffix
 
 
 def run_xml(text: str, font: str, rtl: bool = False, italic: bool = False) -> str:
@@ -98,6 +103,7 @@ def paragraph_xml(text: str, font: str, style: str | None = None, rtl: bool = Fa
         paragraph_properties.extend(("<w:bidi/>", "<w:jc w:val=\"right\"/>"))
     ppr = f'<w:pPr>{"".join(paragraph_properties)}</w:pPr>' if paragraph_properties else ""
     return f'<w:p>{ppr}{run_xml(text, font, rtl=rtl, italic=italic)}</w:p>'
+
 
 
 def document_xml(manifest: dict[str, object]) -> str:

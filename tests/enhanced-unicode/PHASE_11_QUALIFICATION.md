@@ -4,23 +4,25 @@
 
 Phase 11 qualifies the supported logical-font primitive implemented through the production `CPdfWriter` path.
 
-Enhanced Unicode is enabled by default in `sdkjs`. The public switch remains the rollback boundary:
+Enhanced Unicode is qualified as an explicit PDF export option. Ordinary PDF exports retain the compatibility path, while **PDF (Enhanced Unicode)** applies the renderer capability before recalculation:
 
 ```javascript
-AscCommon.SetEnhancedUnicodeEnabled(false);
+AscCommon.ApplyEnhancedUnicodeOption({ enhancedUnicode: true });
 ```
+
+The public switch remains available as a developer and rollback control.
 
 The current result is:
 
 ```text
 supported TrueType logical-font primitive: qualified
-DesktopEditors Enhanced Unicode path:       enabled by default
+DesktopEditors Enhanced Unicode path:       explicit Save As option
 broader corpus and viewer coverage:         continuing qualification
 ```
 
 ## Objective
 
-Phase 11 evaluates PDF syntax, logical-font validity, extraction, source ordering, rendering comparison infrastructure, bounded font publication, and production telemetry. It also records the remaining qualification work after default enablement.
+Phase 11 evaluates PDF syntax, logical-font validity, extraction, source ordering, rendering comparison infrastructure, bounded font publication, and production telemetry. It also records the remaining qualification work for the opt-in export path.
 
 ## Deferred shard finalization
 

@@ -26,13 +26,18 @@ BIDI_CONTROLS = {
 
 
 def case_text(case: dict[str, object]) -> str:
+    prefix = case.get("prefix", "")
+    suffix = case.get("suffix", "")
+    if not isinstance(prefix, str) or not isinstance(suffix, str):
+        raise ValueError(f"Case {case.get('id')} has a non-string prefix or suffix")
+
     text = case.get("text")
     if isinstance(text, str):
-        return text
+        return prefix + text + suffix
     points = case.get("code_points")
     if not isinstance(points, list):
         raise ValueError(f"Case {case.get('id')} has neither text nor code_points")
-    return "".join(chr(int(str(point), 16)) for point in points)
+    return prefix + "".join(chr(int(str(point), 16)) for point in points) + suffix
 
 
 def code_points(text: str) -> list[str]:
